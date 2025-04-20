@@ -22,9 +22,9 @@ main().then(()=>{
 async function main() {
     await mongoose.connect(MONGO_URL);
 };
-
+//home page 
 app.get("/", (req,res)=>{
-  res.send("ram ram ");
+  res.render("home");
 });
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
@@ -124,6 +124,8 @@ app.get("/listings/:id", async (req,res)=>{
   res.render("listings/show.ejs",{listing});
   
 });
+
+
 app.listen(8080,()=>{
     console.log("server  is listening to 8080");
 });

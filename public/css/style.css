@@ -1,11 +1,11 @@
 .navbar{
     height: 5 rem ;
     position:sticky !important;
-    
+    background: #2e7d32;
 }
 .fa-tractor{
-    color:green;
-    font-size: 2 rem ;
+    color:red;
+    font-size: 5 rem ;
 }
 footer {
     background-color:rgba(220, 220, 220);
