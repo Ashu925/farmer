@@ -1,11 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register</title>
 </head>
 <body>
-    hello
+  <h1>login</h1>
+  
+  <% if (typeof error !== "undefined") { %>
+    <p style="color: red;"><%= error %></p>
+  <% } %>
+
+  <form action="/login" method="POST">
+    <label for="username">email:</label><br/>
+   
+    <input type="email" name="email" id="email" required /><br/><br/>
+
+    <label for="password">Password:</label><br/>
+    <input type="password" name="password" id="password" required /><br/><br/>
+
+
+    <button type="submit">login</button>
+  </form>
 </body>
 </html>

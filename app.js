@@ -29,6 +29,8 @@ async function main() {
     await mongoose.connect(MONGO_URL);
 };
 
+//home page 
+
 
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
@@ -58,11 +60,15 @@ app.use(cookieParser());
 app.get("/register", (req, res) => { 
   res.render("register");
 });
+app.get("/logout", (req, res) => { 
+  res.clearCookie('token')
+  return res.render('home',{data:null})
+});
 
 app.post("/register", async (req, res) => {
   try {
-    const { username, password, role } = req.body;
-    const user = await new User({ username, role,password });
+    const { username,email, password, role } = req.body;
+    const user = await User.create({ username,email, role,password });
     if(user)console.log("got new user")
       console.log(user)
     const token= createtoken(user)
@@ -77,18 +83,29 @@ app.post("/register", async (req, res) => {
 app.get("/login", (req, res) => {
   res.render("login");
 });
-app.post("/login",
-  
-  (req, res) => {
+app.post("/login",async(req, res) => {
     // redirect by role
     // if (req.user.role === "seller") return res.redirect("/seller/dashboard");
-    res.redirect("/buyer/dashboard");
+    try {
+      const {email,password}=req.body
+      const token=await User.checkuserandverify(email,password)
+      
+      res.cookie('token',token)
+      return res.redirect('/')
+      
+    } catch (error) {
+      res.render('login',{error:error})
+    }
+
+
+    res.redirect("");
   });
   
   app.get("/logout", (req, res) => {
     req.logout(() => res.redirect("/"));
   });
   
+
 app.use(checkuser)
 
 
@@ -98,19 +115,30 @@ app.use(checkuser)
 
 
 
-app.get("/", (req,res)=>{
-  if(req.user){
+app.get("/", (req, res) => {
+  if (req.user) {
+    return res.render("home", { data: req.user });
 
-
-
-
-    res.render('homepagre',{data:})
-    return res.send(`logined ${req.user.user},${req.user._id}`)
+  } else {
+    return res.render("home", { data: null }); // ✅ send data as null to avoid EJS errors
   }
-  else res.send("unlogined");
 });
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.get("/listings",async(req,res)=>{
+ 
     try{  const allListings =  await  Listing.find({});
       res.render("listings/index.ejs", {allListings});
     }
@@ -155,6 +183,8 @@ app.get("/listings/:id", async (req,res)=>{
   res.render("listings/show.ejs",{listing});
   
 });
+
+
 app.listen(8080,()=>{
     console.log("server  is listening to 8080");
 });

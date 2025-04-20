@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { createHmac, randomBytes } = require("node:crypto");
+const { createtoken } = require("../services/jwtcreater");
 // const { createtoken } = require("../services/jwtcreater");
 
 const userSchema = new mongoose.Schema({
@@ -28,18 +29,20 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-// userSchema.statics.checkuserandverify = async function (email, password) {
-//   const user = await this.findOne({ email }); // make sure email is in schema
-//   if (!user) throw new Error("User not found");
 
-//   const hashedInputPassword = createHmac("sha256", user.salt)
-//     .update(password)
-//     .digest("hex");
 
-//   if (hashedInputPassword !== user.password) throw new Error("Wrong password");
+userSchema.statics.checkuserandverify = async function (email, password) {
+  const user = await this.findOne({ email }); // make sure email is in schema
+  if (!user) throw new Error("User not found");
 
-//   const token = createtoken(user);
-//   return token;
-// };
+  const hashedInputPassword = createHmac("sha256", user.salt)
+    .update(password)
+    .digest("hex");
+
+  if (hashedInputPassword !== user.password) throw new Error("Wrong password");
+
+  const token = createtoken(user)
+  return token;
+};
 
 module.exports = mongoose.model("User", userSchema);

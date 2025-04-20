@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Farmlife</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  
+  <nav>
+    <div class="logo"><a class="navbar-brand" href="/"><i class="fa-solid fa-tractor"></i></i></a></div>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/listings">Shop</a></li>
+      <li><a href="/listings/new">Sell</a></li>
+      <li><a href="/listings/new">Sell</a></li>
+
+<% if (!data) { %>
+    <li><a href="/login">Login</a></li>
+    <li><a href="/register">Register</a></li>
+<% } else { %>
+    <li><a href="">Welcome, <%= data.username %></a></li>
+    <li><a href="/logout">Logout</a></li>
+<% } %>
+
+    
+
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Connecting Farmers Directly to Consumers</h1>
+    <p>Buy fresh. Sell direct. Support local agriculture.</p>
+    <a href="/shop" class="btn">Shop Now</a>
+    <a href="/sell" class="btn btn-secondary">Sell Your Produce</a>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>1. Sign Up</h3>
+        <p>Create your free account as a farmer or consumer.</p>
+      </div>
+      <div class="step">
+        <h3>2. List or Browse</h3>
+        <p>Farmers list their fresh produce. Consumers browse the shop.</p>
+      </div>
+      <div class="step">
+        <h3>3. Buy or Sell</h3>
+        <p>Make secure transactions and enjoy fresh food!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about">
+    <h2>About FarmConnect</h2>
+    <p>We aim to empower farmers by giving them a direct-to-consumer platform. Consumers get access to fresh, local produce while supporting agriculture communities.</p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 FarmConnect. All rights reserved.</p>
+  </footer>
+</body>
+</html>
