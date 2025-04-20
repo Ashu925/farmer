@@ -1,11 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register</title>
 </head>
 <body>
-    register
+  <h1>Sign Up</h1>
+  
+  <% if (typeof error !== "undefined") { %>
+    <p style="color: red;"><%= error %></p>
+  <% } %>
+
+  <form action="/register" method="POST">
+    <label for="username">Username:</label><br/>
+    <input type="text" name="username" id="username" required /><br/><br/>
+
+    <label for="password">Password:</label><br/>
+    <input type="password" name="password" id="password" required /><br/><br/>
+
+    <label for="role">Role:</label><br/>
+    <select name="role" id="role" required>
+      <option value="buyer">Buyer</option>
+      <option value="seller">Seller</option>
+    </select><br/><br/>
+
+    <button type="submit">Register</button>
+  </form>
 </body>
 </html>
