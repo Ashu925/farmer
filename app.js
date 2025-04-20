@@ -113,13 +113,19 @@ app.use(checkuser)
 app.get("/", (req,res)=>{
   if(req.user){
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6fef968 (.|.)
 
 
 
 
     res.render('homepagre',{data:})
+<<<<<<< HEAD
 =======
 >>>>>>> 0053033 (.|.)
+=======
+>>>>>>> 6fef968 (.|.)
     return res.send(`logined ${req.user.user},${req.user._id}`)
   }
   else res.send("unlogined");
