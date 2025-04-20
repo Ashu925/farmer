@@ -29,10 +29,15 @@ async function main() {
     await mongoose.connect(MONGO_URL);
 };
 <<<<<<< HEAD
+<<<<<<< HEAD
 //home page 
 app.get("/", (req,res)=>{
   res.render("home");
 });
+=======
+
+
+>>>>>>> 0053033 (.|.)
 =======
 
 
@@ -107,11 +112,14 @@ app.use(checkuser)
 
 app.get("/", (req,res)=>{
   if(req.user){
+<<<<<<< HEAD
 
 
 
 
     res.render('homepagre',{data:})
+=======
+>>>>>>> 0053033 (.|.)
     return res.send(`logined ${req.user.user},${req.user._id}`)
   }
   else res.send("unlogined");
