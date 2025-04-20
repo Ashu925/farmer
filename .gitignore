@@ -1,0 +1,37 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+
+# IDE files
+.vscode/
+.idea/
+
+# Build files or compiled assets (if any)
+dist/
+build/
+
+# MongoDB data dumps (optional)
+dump/
+
+# Optional: ignore uploads
+uploads/
+
+# Optional: ignore session data
+sessions/
+
+# Cache
+.cache/

@@ -1,0 +1,107 @@
+<!-- <% layout("/layouts/biolerplate")%>
+<body>
+    <h3>listing detail : </h3>
+    <ul>
+        <li><%= listing.title%></li>
+        <li><%= listing.description%></li>
+        <li>&#8377;<%=listing.price.toLocaleString("en-IN")%></li>
+        <li><%= listing.location %></li>
+        <li><%= listing.country %></li>
+    
+    </ul>
+    <a href="/listings/<%=listing._id %>/edit">edit this listing </a>
+    <br><br>
+    <form method="POST" action="/listings/<%=listing._id %>?_method=DELETE">
+<button>delete this listings </button> 
+    </form>
+</body> -->
+<% layout("/layouts/biolerplate") %>
+
+<style>
+    body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f2f5;
+        padding: 50px 20px;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin: auto;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    h3 {
+        text-align: center;
+        color: #222;
+        margin-bottom: 30px;
+        font-size: 24px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 15px;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="form-container">
+    <h3>Edit Listing</h3>
+
+    <form method="POST" action="/listings/<%= listing._id %>?_method=PUT">
+
+        <label for="title" class="form-label">Title</label>
+        <input name="listing[title]" id="title" value="<%= listing.title %>" type="text" class="form-control" required>
+
+        <label for="description" class="form-label">Description</label>
+        <textarea name="listing[description]" id="description" class="form-control" rows="4" required><%= listing.description %></textarea>
+
+        <label for="image" class="form-label">Image URL</label>
+        <input name="listing[image]" id="image" value="<%= listing.image %>" type="text" class="form-control">
+
+        <label for="price" class="form-label">Price</label>
+        <input name="listing[price]" id="price" value="<%= listing.price %>" type="number" min="0" class="form-control" required>
+
+        <label for="location" class="form-label">Location</label>
+        <input name="listing[location]" id="location" value="<%= listing.location %>" type="text" class="form-control" required>
+
+        <button class="btn" type="submit">Save Changes</button>
+
+    </form>
+</div>

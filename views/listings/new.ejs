@@ -1,0 +1,100 @@
+<% layout("/layouts/biolerplate") %>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 40px;
+    }
+    .navbar{
+        position: sticky !important;
+    }
+
+    .form-container {
+        background: #fff;
+        padding: 30px;
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .btn {
+        background-color: #333;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    .btn:hover {
+        background-color: #555;
+    }
+</style>
+
+<div class="form-container">
+    <h3>Create New Listing</h3>
+
+    <form method="POST" action="/listings">
+
+        <div>
+            <label for="title" class="form-label">Title</label>
+            <input name="listing[title]" id="title" type="text"  class="form-control" required>
+        </div>
+
+        <div>
+            <label for="description" class="form-label">Description</label>
+            <textarea name="listing[description]" id="description"  class="form-control" rows="4" required></textarea>
+        </div>
+
+        <div>
+            <label for="image" class="form-label">Image URL</label>
+            <input name="listing[image]" id="image" type="text" placeholder="Enter image URL" class="form-control">
+        </div>
+
+        <div>
+            <label for="price" class="form-label">Price</label>
+            <input name="listing[price]" id="price" type="number" placeholder="Enter the price" min="0"  class="form-control"required>
+        </div>
+
+        <div>
+            <label for="location" class="form-label">Location</label>
+            <input name="listing[location]" id="location" type="text" placeholder="Enter the location"  class="form-control" required>
+        </div>
+
+        <div>
+            <label for="country" class="form-label">Country</label>
+            <input name="listing[country]" id="country" type="text" placeholder="Enter the country" class="form-control"  required>
+        </div>
+
+        <button type="submit" class="btn">Add Listing</button>
+
+    </form>
+</div>
+
+

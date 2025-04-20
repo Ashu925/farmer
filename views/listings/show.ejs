@@ -1,0 +1,123 @@
+
+<!-- <% layout("/layouts/biolerplate")%>
+
+<body>
+    <form method="POST" action="/listings/<%=listing._id%>?_method=PUT">
+        <input name="listing[title]" value="<%= listing.title%> " type="text">
+        <textarea name="listing[description]" ><%= listing.description%>"</textarea>
+        <input name="listing[image]" value="<%= listing.image %>" type="">
+        <input name="listing[price]" value="<%= listing.price %> " type="number">
+        <input name="listing[location]" value="<%= listing.location%> " type="text">
+        <button>edit</button>
+    </form>
+    
+</body> -->
+<% layout("/layouts/biolerplate") %>
+
+<style>
+    body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        padding: 60px 20px;
+    }
+
+    .details-card {
+        max-width: 700px;
+        margin: auto;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    h3 {
+        font-size: 26px;
+        color: #333;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 30px;
+        text-align: left;
+    }
+
+    ul li {
+        background-color: #f0f2f5;
+        margin-bottom: 12px;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 16px;
+        color: #444;
+    }
+
+    .listing-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        object-fit: cover;
+    }
+
+    a {
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        transition: background-color 0.3s;
+        font-weight: bold;
+    }
+
+    a:hover {
+        background-color: #0056b3;
+    }
+
+    form {
+        margin-top: 10px;
+    }
+
+    button {
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #b02a37;
+    }
+</style>
+
+<div class="details-card">
+    <h3>Listing Details</h3>
+
+    <% if (listing.image) { %>
+        <img src="<%= listing.image %>" alt="Listing image" class="listing-image" />
+    <% } %>
+
+    <ul>
+        <li><strong>Title:</strong> <%= listing.title %></li>
+        <li><strong>Description:</strong> <%= listing.description %></li>
+        <li><strong>Price:</strong> ₹<%= listing.price.toLocaleString("en-IN") %></li>
+        <li><strong>Location:</strong> <%= listing.location %></li>
+        <li><strong>Country:</strong> <%= listing.country %></li>
+    </ul>
+
+    <a href="/listings/<%= listing._id %>/edit">Edit this listing</a>
+
+    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+        <button type="submit">Delete this listing</button>
+    </form>
+</div>
+
