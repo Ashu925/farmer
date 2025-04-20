@@ -28,20 +28,17 @@ app.use(express.json());
 async function main() {
     await mongoose.connect(MONGO_URL);
 };
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 //home page 
 app.get("/", (req,res)=>{
   res.render("home");
 });
-=======
 
 
->>>>>>> 0053033 (.|.)
-=======
 
 
->>>>>>> 0053033 (.|.)
+
+
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
 app.use(express.urlencoded({extended:true}));
@@ -112,20 +109,12 @@ app.use(checkuser)
 
 app.get("/", (req,res)=>{
   if(req.user){
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 6fef968 (.|.)
 
 
 
 
-    res.render('homepagre',{data:})
-<<<<<<< HEAD
-=======
->>>>>>> 0053033 (.|.)
-=======
->>>>>>> 6fef968 (.|.)
+    res.render('home',{data:req.user})
+
     return res.send(`logined ${req.user.user},${req.user._id}`)
   }
   else res.send("unlogined");
