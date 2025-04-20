@@ -13,7 +13,7 @@ const User = require("./models/user");
 const authRoutes = require("./routes/auth");
 const buyerRoutes = require("./routes/buyer");
 const sellerRoutes = require("./routes/seller");
-const { createtoken } = require("./services/jwtcreater.js");
+const { createtoken,validate, validator } = require("./services/jwtcreater.js");
 const cookieParser = require("cookie-parser");
 const { checkuser } = require("./services/cokkiechecker.js");
 main().then(()=>{
@@ -28,12 +28,6 @@ app.use(express.json());
 async function main() {
     await mongoose.connect(MONGO_URL);
 };
-
-//home page 
-app.get("/", (req,res)=>{
-  res.render("home");
-});
-
 
 
 
@@ -88,14 +82,28 @@ app.get("/login", (req, res) => {
 });
 app.post("/login",
   
-  (req, res) => {
+  async(req, res) => {
+    try {
+      const {email,password}=req.body
+      const token =await User.checkuserandverify(email,password)
+      if(token){
+        console.log('logged in')
+        console.log("sdfsssssssssss")
+        res.cookie('token',token)
+     
+        return res.redirect('/')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+
     // redirect by role
     // if (req.user.role === "seller") return res.redirect("/seller/dashboard");
-    res.redirect("/buyer/dashboard");
+   
   });
   
   app.get("/logout", (req, res) => {
-    req.logout(() => res.redirect("/"));
+    res.clearCookie('token').render('home',{data:null})
   });
   
 app.use(checkuser)
@@ -109,17 +117,16 @@ app.use(checkuser)
 
 app.get("/", (req,res)=>{
   if(req.user){
+    console.log('//')
+    
+   return  res.render('home',{data:req.user})
 
 
-
-
-    res.render('home',{data:req.user})
-
-    return res.send(`logined ${req.user.user},${req.user._id}`)
+    // return res.send(`logined ${req.user.user},${req.user._id}`)
   }
-  else res.send("unlogined");
+  else {return  res.render('home',{data:null});}
 });
-  
+
 app.get("/listings",async(req,res)=>{
     try{  const allListings =  await  Listing.find({});
       res.render("listings/index.ejs", {allListings});

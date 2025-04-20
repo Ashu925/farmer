@@ -4,10 +4,12 @@ const checkuser=async (req,res,next) => {
     try {
         const token=req.cookies.token
         if(!token){
+            console.log("in 1")
             return res.render('home')
         }
         const payload=validator(token)
         if (!payload){
+            console.log("in 2")
             return res.render('home')
         }
         req.user=payload
