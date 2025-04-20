@@ -13,19 +13,23 @@ const User = require("./models/user");
 const authRoutes = require("./routes/auth");
 const buyerRoutes = require("./routes/buyer");
 const sellerRoutes = require("./routes/seller");
+const { createtoken } = require("./services/jwtcreater.js");
+const cookieParser = require("cookie-parser");
+const { checkuser } = require("./services/cokkiechecker.js");
 main().then(()=>{
     console.log("connected to DB");
 }).catch((err)=>{
     console.log(err);
 });
+app.use(express.urlencoded({ extended: true }));
 
+
+app.use(express.json());
 async function main() {
     await mongoose.connect(MONGO_URL);
 };
 
-app.get("/", (req,res)=>{
-  res.send("ram ram ");
-});
+
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
 app.use(express.urlencoded({extended:true}));
@@ -44,55 +48,77 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// passport.use(new LocalStrategy(User.authenticate()));
+// passport.serializeUser(User.serializeUser());
+app.use(cookieParser());
+// passport.deserializeUser(User.deserializeUser());
 
-app.get("/listings",async(req,res)=>{
-  try{  const allListings =  await  Listing.find({});
-    res.render("listings/index.ejs", {allListings});
-  }
-  catch(err){
-    console.log(err)
-res.send("internal error found")
-  }
+//login route
 
-});
-//new route 
-app.get("/listings/new",(req,res)=>{
-  res.render("listings/new.ejs");
-  });
-
-//create route 
 app.get("/register", (req, res) => { 
-  res.render("auth/register");
+  res.render("register");
 });
 
 app.post("/register", async (req, res) => {
-  const { username, password, role } = req.body;
-  const user = new User({ username, role });
-  const registeredUser = await User.register(user, password);
-  res.redirect("/login");
+  try {
+    const { username, password, role } = req.body;
+    const user = await new User({ username, role,password });
+    if(user)console.log("got new user")
+      console.log(user)
+    const token= createtoken(user)
+    console.log(token)
+    res.cookie('token',token)
+    res.redirect("/");
+  } catch (error) {
+    console.log(error)
+  }
 });
 
 app.get("/login", (req, res) => {
-  res.render("auth/login");
+  res.render("login");
 });
 app.post("/login",
-  passport.authenticate("local", { failureRedirect: "/login" }),
+  
   (req, res) => {
     // redirect by role
-    if (req.user.role === "seller") return res.redirect("/seller/dashboard");
+    // if (req.user.role === "seller") return res.redirect("/seller/dashboard");
     res.redirect("/buyer/dashboard");
   });
+  
+  app.get("/logout", (req, res) => {
+    req.logout(() => res.redirect("/"));
+  });
+  
+app.use(checkuser)
 
-app.get("/logout", (req, res) => {
-  req.logout(() => res.redirect("/"));
+
+// main rout
+
+
+
+
+
+app.get("/", (req,res)=>{
+  if(req.user){
+    return res.send(`logined ${req.user.user},${req.user._id}`)
+  }
+  else res.send("unlogined");
 });
-
-
-
-
+  
+app.get("/listings",async(req,res)=>{
+    try{  const allListings =  await  Listing.find({});
+      res.render("listings/index.ejs", {allListings});
+    }
+    catch(err){
+      console.log(err)
+  res.send("internal error found")
+    }
+  
+  });
+  //
+app.get("/listings/new",(req,res)=>{
+    res.render("listings/new.ejs");
+    });
 app.post("/listings",async(req,res)=>{
   const newListing =   new Listing(req.body.listing);
  await  newListing.save();
