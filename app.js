@@ -107,6 +107,11 @@ app.use(checkuser)
 
 app.get("/", (req,res)=>{
   if(req.user){
+
+
+
+
+    res.render('homepagre',{data:})
     return res.send(`logined ${req.user.user},${req.user._id}`)
   }
   else res.send("unlogined");
