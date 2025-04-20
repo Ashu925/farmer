@@ -29,6 +29,7 @@ async function main() {
     await mongoose.connect(MONGO_URL);
 };
 <<<<<<< HEAD
+<<<<<<< HEAD
 //home page 
 app.get("/", (req,res)=>{
   res.render("home");
@@ -37,6 +38,12 @@ app.get("/", (req,res)=>{
 
 
 >>>>>>> 0053033 (.|.)
+=======
+
+//home page 
+
+
+>>>>>>> 8a9d1dfaceecf8f791718f4a8e1f65ff3e2adfef
 app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
 app.use(express.urlencoded({extended:true}));
@@ -64,12 +71,24 @@ app.use(cookieParser());
 
 app.get("/register", (req, res) => { 
   res.render("register");
+<<<<<<< HEAD
+=======
+});
+app.get("/logout", (req, res) => { 
+  res.clearCookie('token')
+  return res.render('home',{data:null})
+>>>>>>> 8a9d1dfaceecf8f791718f4a8e1f65ff3e2adfef
 });
 
 app.post("/register", async (req, res) => {
   try {
+<<<<<<< HEAD
     const { username, password, role } = req.body;
     const user = await new User({ username, role,password });
+=======
+    const { username,email, password, role } = req.body;
+    const user = await User.create({ username,email, role,password });
+>>>>>>> 8a9d1dfaceecf8f791718f4a8e1f65ff3e2adfef
     if(user)console.log("got new user")
       console.log(user)
     const token= createtoken(user)
@@ -84,6 +103,7 @@ app.post("/register", async (req, res) => {
 app.get("/login", (req, res) => {
   res.render("login");
 });
+<<<<<<< HEAD
 app.post("/login",
   
   (req, res) => {
@@ -99,12 +119,41 @@ app.post("/login",
 app.use(checkuser)
 
 
+=======
+app.post("/login",async(req, res) => {
+    // redirect by role
+    // if (req.user.role === "seller") return res.redirect("/seller/dashboard");
+    try {
+      const {email,password}=req.body
+      const token=await User.checkuserandverify(email,password)
+      
+      res.cookie('token',token)
+      return res.redirect('/')
+      
+    } catch (error) {
+      res.render('login',{error:error})
+    }
+
+
+    res.redirect("");
+  });
+  
+  app.get("/logout", (req, res) => {
+    req.logout(() => res.redirect("/"));
+  });
+  
+
+app.use(checkuser)
+
+
+>>>>>>> 8a9d1dfaceecf8f791718f4a8e1f65ff3e2adfef
 // main rout
 
 
 
 
 
+<<<<<<< HEAD
 app.get("/", (req,res)=>{
   if(req.user){
 
@@ -118,6 +167,32 @@ app.get("/", (req,res)=>{
 });
   
 app.get("/listings",async(req,res)=>{
+=======
+app.get("/", (req, res) => {
+  if (req.user) {
+    return res.render("home", { data: req.user });
+
+  } else {
+    return res.render("home", { data: null }); // ✅ send data as null to avoid EJS errors
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.get("/listings",async(req,res)=>{
+ 
+>>>>>>> 8a9d1dfaceecf8f791718f4a8e1f65ff3e2adfef
     try{  const allListings =  await  Listing.find({});
       res.render("listings/index.ejs", {allListings});
     }
