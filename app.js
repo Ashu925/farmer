@@ -99,6 +99,7 @@ app.post("/login",
   async(req, res) => {
     try {
       const {email,password}=req.body
+      
       const token =await User.checkuserandverify(email,password)
       if(token){
         console.log('logged in')
