@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Form</title>
+    <style>
+        /* Reset default margin and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #4CAF50;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 150px;
+        }
+
+        .form-group button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+
+        .form-group button:active {
+            background-color: #3e8e41;
+        }
+
+        .form-group button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+
+        .form-group .image-preview {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .form-group .image-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .form-group select {
+            background-color: #f8f8f8;
+        }
+
+        .form-container p {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h1>Create Listing</h1>
+        <form id="createForm" method="post" action="/createproduct">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" placeholder="Enter Title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" placeholder="Enter Description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="image-link">Image Link</label>
+                <input type="url" id="image-link" name="image-link" placeholder="Enter Image URL" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" id="price" name="price" placeholder="Enter Price" required>
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <select id="location" name="location" required>
+                    <option value="">Select State/Union Territory</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                    <option value="Assam">Assam</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Goa">Goa</option>
+                    <option value="Gujarat">Gujarat</option>
+                    <option value="Haryana">Haryana</option>
+                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                    <option value="Jharkhand">Jharkhand</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Manipur">Manipur</option>
+                    <option value="Meghalaya">Meghalaya</option>
+                    <option value="Mizoram">Mizoram</option>
+                    <option value="Nagaland">Nagaland</option>
+                    <option value="Odisha">Odisha</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Sikkim">Sikkim</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Tripura">Tripura</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="Uttarakhand">Uttarakhand</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                    <option value="Chandigarh">Chandigarh</option>
+                    <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                    <option value="Lakshadweep">Lakshadweep</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Puducherry">Puducherry</option>
+                    <option value="Ladakh">Ladakh</option>
+                    <option value="Lakhimpur Kheri">Lakhimpur Kheri</option>
+                    <option value="NCT of Delhi">NCT of Delhi</option>
+                    <option value="Northeastern States">Northeastern States</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <select id="country" name="country" required>
+                    <option value="">Select Country</option>
+                    <option value="USA">USA</option>
+                    <option value="Canada">Canada</option>
+                    <option value="UK">UK</option>
+                    <option value="India">India</option>
+                    <option value="Australia">Australia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+        <div class="image-preview" id="imagePreview"></div>
+    </div>
+
+    <script>
+        document.getElementById('image-link').addEventListener('input', function() {
+            const imageUrl = this.value;
+            const previewContainer = document.getElementById('imagePreview');
+            
+            if (imageUrl) {
+                previewContainer.innerHTML = `<img src="${imageUrl}" alt="Image Preview">`;
+            } else {
+                previewContainer.innerHTML = '';
+            }
+        });
+
+        document.getElementById('createForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Get values from form fields
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    const imageLink = document.getElementById('image-link').value;
+    const price = document.getElementById('price').value;
+    const location = document.getElementById('location').value;
+    const country = document.getElementById('country').value;
+
+    // Perform form validation
+    if (title && description && imageLink && price && location && country) {
+        const formData = {
+            title: title,
+            description: description,
+            image: imageLink,
+            price: price,
+            location: location,
+            country: country
+        };
+
+        // Send POST request to server
+        fetch('/createproduct', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add other headers if needed, such as authorization tokens.
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Product created successfully!');
+                // Optionally redirect to another page, e.g., the product listing page.
+                window.location.href = '/product-list'; 
+            } else {
+                alert('Error creating product: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting the form!');
+        });
+    } else {
+        alert('Please fill in all fields!');
+    }
+});
+
+       
+    </script>
+
+</body>
+</html>
