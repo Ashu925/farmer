@@ -1,0 +1,23 @@
+
+<% layout("/layouts/biolerplate") %>
+
+<div class="details-card">
+    <h3><%= listing.title %></h3>
+    <img src="<%= listing.image %>" alt="Listing Image" class="listing-image" />
+    <p><%= listing.description %></p>
+    <p><strong>Price Mentioned:</strong> ₹<%= listing.price %></p>
+    <p><strong>Location:</strong> <%= listing.location %>, <%= listing.country %></p>
+
+    <h4>Place Your Bid</h4>
+    <form action="/listings/<%= listing._id %>/bids" method="POST">
+        <label for="amount">Bid Amount:</label><br/>
+        <input type="number" name="amount" required><br/><br/>
+
+        <label for="message">Message:</label><br/>
+        <textarea name="message" rows="3"></textarea><br/><br/>
+
+        <button type="submit">Submit Bid</button>
+    </form>
+
+    <h5 class="mt-4">Total Bids: <%= listing.bids.length %></h5>
+</div>

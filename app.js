@@ -202,18 +202,6 @@ app.post('/createproduct',async (req,res) => {
   
 })
 
-
-
-
-
-
-
-
-
-
-
-
-
 app.get("/listings",async(req,res)=>{
  
  
@@ -255,11 +243,46 @@ app.delete("/listings/:id", async(req,res)=>{
   res.redirect("/listings")
 });
 //show route 
-app.get("/listings/:id", async (req,res)=>{
-  let {id}= req.params;
-  const listing =   await Listing.findById(id);
-  res.render("listings/show.ejs",{listing});
+app.get("/listings/:id", async (req, res) => {
+  let { id } = req.params;
+  const listing = await Listing.findById(id);
+
+  if (req.user.role === "buyer") {
+    res.render("listings/show_buyer", { listing, data: req.user });
+  } else {
+    res.render("listings/show_seller", { listing, data: req.user });
+  }
+});
   
+
+app.post("/listings/:id/bids", async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    listing.bids.push({
+      bidder: req.user._id,
+      amount: req.body.amount,
+      message: req.body.message,
+    });
+    await listing.save();
+    res.redirect(`/listings/${listing._id}`);
+  } catch (err) {
+    console.log(err);
+    res.redirect("/listings");
+  }
+});
+
+// POST - Select a bid (farmer only)
+app.post("/listings/:id/select/:bidId", async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    const bid = listing.bids.id(req.params.bidId);
+    listing.selectedBid = bid.bidder;
+    await listing.save();
+    res.redirect(`/listings/${listing._id}`);
+  } catch (err) {
+    console.log(err);
+    res.redirect("/listings");
+  }
 });
 
 

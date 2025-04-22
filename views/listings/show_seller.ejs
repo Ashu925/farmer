@@ -1,0 +1,32 @@
+
+
+ <% layout("/layouts/biolerplate") %>
+
+ <div class="details-card">
+     <h3><%= listing.title %></h3>
+     <img src="<%= listing.image %>" alt="Listing Image" class="listing-image" />
+     <p><strong>Description:</strong> <%= listing.description %></p>
+     <p><strong>Price:</strong> ₹<%= listing.price %></p>
+     <p><strong>Location:</strong> <%= listing.location %></p>
+     <p><strong>Country:</strong> <%= listing.country %></p>
+ 
+     <a href="/listings/<%= listing._id %>/edit">Edit</a>
+ 
+     <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+         <button type="submit">Delete</button>
+     </form>
+ 
+     <h4 class="mt-4">Bids (<%= listing.bids.length %>)</h4>
+     <ul>
+         <% listing.bids.forEach(bid => { %>
+             <li>
+                 <p><strong>Amount:</strong> ₹<%= bid.amount %></p>
+                 <p><strong>Message:</strong> <%= bid.message %></p>
+                 <form method="POST" action="/listings/<%= listing._id %>/select/<%= bid._id %>">
+                     <button type="submit">Select This Bid</button>
+                 </form>
+             </li>
+         <% }) %>
+     </ul>
+ </div>
+ 
