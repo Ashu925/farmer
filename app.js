@@ -77,8 +77,7 @@ app.post("/register", async (req, res) => {
     const {username, password, role } = req.body;
     const user = await new User({ username, role,password });
 
-    const { username,email, password, role } = req.body;
-    const user = await User.create({ username,email, role,password });
+   
 
     if(user)console.log("got new user")
       console.log(user)
@@ -170,8 +169,7 @@ app.get("/", (req,res)=>{
   else {return  res.render('home',{data:null});}
 });
 
-app.get("/listings",async(req,res)=>{
-}
+
 app.get("/", (req, res) => {
   if (req.user) {
     return res.render("home", { data: req.user });
