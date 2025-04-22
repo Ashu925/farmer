@@ -15,6 +15,7 @@
       <li><a href="/about">About</a></li>
       <li><a href="/listings">Shop</a></li>
       <li><a href="/listings/new">Sell</a></li>
+<<<<<<< HEAD
 
       <% if (data) { %>
         <li><a href="/logout">Logout</a></li>
@@ -23,6 +24,19 @@
           <li><a href="/register">Register</a></li>
           <% } %>
        
+=======
+      <li><a href="/listings/new">Sell</a></li>
+
+<% if (!data) { %>
+    <li><a href="/login">Login</a></li>
+    <li><a href="/register">Register</a></li>
+<% } else { %>
+    <li><a href="">Welcome, <%= data.username %></a></li>
+    <li><a href="/logout">Logout</a></li>
+<% } %>
+
+    
+>>>>>>> 0902396f4ef9f0d516222488c942d4f937cc64b1
 
     </ul>
   </nav>

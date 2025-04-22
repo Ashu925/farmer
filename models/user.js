@@ -1,6 +1,13 @@
 const mongoose = require("mongoose");
 const { createHmac, randomBytes } = require("node:crypto");
+<<<<<<< HEAD
 const { createtoken } = require("../services/jwtcreater");
+=======
+<<<<<<< HEAD
+=======
+const { createtoken } = require("../services/jwtcreater");
+>>>>>>> 8a9d1dfaceecf8f791718f4a8e1f65ff3e2adfef
+>>>>>>> 0902396f4ef9f0d516222488c942d4f937cc64b1
 // const { createtoken } = require("../services/jwtcreater");
 
 const userSchema = new mongoose.Schema({
@@ -29,6 +36,36 @@ userSchema.pre("save", function (next) {
   next();
 });
 
+<<<<<<< HEAD
+userSchema.statics.checkuserandverify = async function (email, password) {
+  const user = await this.findOne({ email }); // make sure email is in schema
+  if (!user) throw new Error("User not found");
+=======
+<<<<<<< HEAD
+// userSchema.statics.checkuserandverify = async function (email, password) {
+//   const user = await this.findOne({ email }); // make sure email is in schema
+//   if (!user) throw new Error("User not found");
+>>>>>>> 0902396f4ef9f0d516222488c942d4f937cc64b1
+
+  const hashedInputPassword = createHmac("sha256", user.salt)
+    .update(password)
+    .digest("hex");
+
+<<<<<<< HEAD
+  if (hashedInputPassword !== user.password) throw new Error("Wrong password");
+  
+  const token = createtoken(user);
+  return token;
+};
+=======
+//   if (hashedInputPassword !== user.password) throw new Error("Wrong password");
+
+//   const token = createtoken(user);
+//   return token;
+// };
+=======
+
+
 userSchema.statics.checkuserandverify = async function (email, password) {
   const user = await this.findOne({ email }); // make sure email is in schema
   if (!user) throw new Error("User not found");
@@ -38,9 +75,11 @@ userSchema.statics.checkuserandverify = async function (email, password) {
     .digest("hex");
 
   if (hashedInputPassword !== user.password) throw new Error("Wrong password");
-  
-  const token = createtoken(user);
+
+  const token = createtoken(user)
   return token;
 };
+>>>>>>> 8a9d1dfaceecf8f791718f4a8e1f65ff3e2adfef
+>>>>>>> 0902396f4ef9f0d516222488c942d4f937cc64b1
 
 module.exports = mongoose.model("User", userSchema);
