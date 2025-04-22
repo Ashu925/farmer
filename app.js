@@ -143,7 +143,8 @@ app.post("/login",async(req, res) => {
   });
   
   app.get("/logout", (req, res) => {
-    req.logout(() => res.redirect("/"));
+    res.clearCookie('token').redirect('/')
+   
   });
   
 
@@ -157,11 +158,15 @@ app.use(checkuser)
 
 
 
-app.get("/", (req,res)=>{
+app.get("/", async(req,res)=>{
   if(req.user){
-    console.log('//')
-    
-   return  res.render('home',{data:req.user})
+    console.log('//');
+    const dataa = await Listing.find()
+    .sort({ _id: -1 })  
+    .populate('createdby', 'username email');
+    // console.log(dataa);  
+    return res.render('home2', { products: dataa, data: req.user });
+
 
 
     // return res.send(`logined ${req.user.user},${req.user._id}`)
@@ -170,15 +175,31 @@ app.get("/", (req,res)=>{
 });
 
 
-app.get("/", (req, res) => {
-  if (req.user) {
-    return res.render("home", { data: req.user });
-
-  } else {
-    return res.render("home", { data: null }); // ✅ send data as null to avoid EJS errors
+app.get('/createList',(req,res)=>{
+  try {
+    res.render('Poductbuilder')
+  } catch (error) {
+    res.redirect('/')
   }
-});
+})
+app.post('/createproduct',async (req,res) => {
+  try {
+    const {title,description,image,location,country,price}=req.body
+    if (!title || !description || !image || !location || !country || !price) {
+      return res.status(500).json({ success: false, message: 'Server error while creating product' });
+ 
+    }
+    const data= await Listing.create({title,description,image,location,country,price,createdby:req.user._id})
 
+      return res.status(201).json({ success: true, message: 'Product created successfully', data: data });
+   
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ success: false, message: 'Server error while creating product' });
+ 
+  }
+  
+})
 
 
 
