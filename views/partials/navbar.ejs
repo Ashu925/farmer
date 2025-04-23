@@ -1,0 +1,147 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-store"></i> Farmer's Market
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/listings">
+                        <i class="fas fa-list"></i> All Listings
+                    </a>
+                </li>
+                <% if (currentUser && currentUser.role === 'seller') { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/listings/new">
+                            <i class="fas fa-plus"></i> Add New Listing
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+            <ul class="navbar-nav">
+                <% if (currentUser) { %>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-comments"></i> Messages
+                            <% if (unreadMessages && unreadMessages > 0) { %>
+                                <span class="badge bg-danger"><%= unreadMessages %></span>
+                            <% } %>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="messagesDropdown">
+                            <li><a class="dropdown-item" href="/chat">All Messages</a></li>
+                            <% if (currentUser.role === 'buyer') { %>
+                                <li><a class="dropdown-item" href="/chat/buyer">My Bids</a></li>
+                            <% } else if (currentUser.role === 'seller') { %>
+                                <li><a class="dropdown-item" href="/chat/seller">My Listings</a></li>
+                            <% } %>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i> <%= currentUser.username %>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <% if (currentUser.role === 'buyer') { %>
+                                <li><a class="dropdown-item" href="/buyer/dashboard">Dashboard</a></li>
+                            <% } else if (currentUser.role === 'seller') { %>
+                                <li><a class="dropdown-item" href="/seller/dashboard">Dashboard</a></li>
+                            <% } %>
+                            <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register">Register</a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<style>
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0.5rem 1rem;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.navbar-brand i {
+    margin-right: 0.5rem;
+    color: #27ae60;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: #2c3e50;
+    padding: 0.5rem 1rem;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #27ae60;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    color: #2c3e50;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #27ae60;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+}
+
+.badge {
+    font-size: 0.7rem;
+    padding: 0.25em 0.5em;
+    margin-left: 0.25rem;
+}
+
+.fa-home, .fa-list, .fa-plus, .fa-comments, .fa-user {
+    margin-right: 0.25rem;
+}
+
+@media (max-width: 991.98px) {
+    .navbar-nav {
+        padding: 1rem 0;
+    }
+    
+    .nav-item {
+        margin: 0.5rem 0;
+    }
+    
+    .dropdown-menu {
+        border: none;
+        box-shadow: none;
+    }
+}
+</style> 

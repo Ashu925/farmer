@@ -20,15 +20,60 @@ const { checkuser } = require("./services/cokkiechecker.js");
 const multer = require("multer");
 const { sendBidSelectedEmail } = require('./services/emailService');
 const flash = require('connect-flash');
+const ExpressError = require('./utils/ExpressError');
+const http = require('http');
+const socketio = require('socket.io');
+const chatRoutes = require('./routes/chat');
+const Chat = require('./models/chat');
+
+const server = http.createServer(app);
+const io = socketio(server);
+
+// Make io accessible to routes
+app.set('io', io);
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URL)
     .then(() => console.log("Connected to DB"))
     .catch(err => console.error("DB connection error:", err));
 
+// Passport configuration
+passport.use(new LocalStrategy({
+    usernameField: 'email' // Use email instead of username
+}, async (email, password, done) => {
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return done(null, false, { message: 'Invalid email or password' });
+        }
+
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            return done(null, false, { message: 'Invalid email or password' });
+        }
+
+        return done(null, user);
+    } catch (error) {
+        return done(error);
+    }
+}));
+
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (error) {
+        done(error);
+    }
+});
+
 // Session configuration
 const sessionConfig = {
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -43,9 +88,9 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
+app.use(cookieParser());
 app.use(session(sessionConfig));
 app.use(flash());
-app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -66,20 +111,47 @@ app.use(express.static(path.join(__dirname,"/public")))
 // app.use(authRoutes);
 app.use(buyerRoutes);
 app.use(sellerRoutes);
+app.use('/chat', chatRoutes);
 
 // Authentication routes
 app.get("/register", (req, res) => { 
+    if (req.user) {
+        return res.redirect('/');
+    }
     res.render("register");
 });
 
 app.post("/register", async (req, res) => {
     try {
         const { username, password, role, email } = req.body;
+        
+        // Check if user already exists
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            req.flash('error', 'Email or username already exists');
+            return res.redirect("/register");
+        }
+
         const user = new User({ username, role, password, email });
         await user.save();
         
-        req.flash('success', 'Registration successful! Please login.');
-        res.redirect("/login");
+        // Log the user in after registration
+        req.login(user, (err) => {
+            if (err) {
+                req.flash('error', 'Registration successful but login failed');
+                return res.redirect("/login");
+            }
+            
+            const token = createtoken(user);
+            res.cookie('token', token);
+            
+            req.flash('success', 'Registration successful!');
+            if (user.role === "seller") {
+                return res.redirect("/seller/dashboard");
+            } else {
+                return res.redirect("/buyer/dashboard");
+            }
+        });
     } catch (error) {
         console.log(error);
         req.flash('error', 'Registration failed. Please try again.');
@@ -88,45 +160,52 @@ app.post("/register", async (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+    if (req.user) {
+        return res.redirect('/');
+    }
     res.render("login");
 });
 
-app.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        
+app.post("/login", (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            console.error('Authentication error:', err);
+            req.flash('error', 'An error occurred during login');
+            return res.redirect('/login');
+        }
         if (!user) {
-            req.flash('error', 'Invalid email or password');
+            req.flash('error', info.message || 'Invalid email or password');
             return res.redirect('/login');
         }
-
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            req.flash('error', 'Invalid email or password');
-            return res.redirect('/login');
-        }
-
-        const token = createtoken(user);
-        res.cookie('token', token);
-        
-        // Redirect based on role
-        if (user.role === "seller") {
-            return res.redirect("/seller/dashboard");
-        } else {
-            return res.redirect("/buyer/dashboard");
-        }
-    } catch (error) {
-        console.log(error);
-        req.flash('error', 'Login failed. Please try again.');
-        res.redirect('/login');
-    }
+        req.logIn(user, (err) => {
+            if (err) {
+                console.error('Login error:', err);
+                req.flash('error', 'An error occurred during login');
+                return res.redirect('/login');
+            }
+            
+            const token = createtoken(user);
+            res.cookie('token', token);
+            
+            req.flash('success', 'Welcome back!');
+            if (user.role === "seller") {
+                return res.redirect("/seller/dashboard");
+            } else {
+                return res.redirect("/buyer/dashboard");
+            }
+        });
+    })(req, res, next);
 });
 
 app.get("/logout", (req, res) => {
-    res.clearCookie('token');
-    req.flash('success', 'Logged out successfully');
-    res.redirect('/');
+    req.logout((err) => {
+        if (err) {
+            console.error('Error during logout:', err);
+        }
+        res.clearCookie('token');
+        req.flash('success', 'Logged out successfully');
+        res.redirect('/');
+    });
 });
 
 app.use(checkuser)
@@ -445,6 +524,53 @@ app.get("/seller/listings", async (req, res) => {
     }
 });
 
-app.listen(8080,()=>{
-    console.log("server  is listening to 8080");
+// Create a valid temporary user ID
+const TEMP_USER_ID = new mongoose.Types.ObjectId('000000000000000000000000');
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+    console.log('New client connected:', {
+        socketId: socket.id,
+        handshake: socket.handshake
+    });
+
+    // Handle joining chat rooms
+    socket.on('join-chat', (chatId) => {
+        console.log('User joining chat:', {
+            socketId: socket.id,
+            chatId: chatId
+        });
+        socket.join(chatId);
+        console.log(`User joined chat: ${chatId}`);
+    });
+
+    // Handle message events
+    socket.on('new-message', (data) => {
+        console.log('Received new message event:', {
+            socketId: socket.id,
+            data: data
+        });
+    });
+
+    // Handle errors
+    socket.on('error', (error) => {
+        console.error('Socket error:', {
+            socketId: socket.id,
+            error: error
+        });
+    });
+
+    // Handle disconnection
+    socket.on('disconnect', (reason) => {
+        console.log('Client disconnected:', {
+            socketId: socket.id,
+            reason: reason
+        });
+    });
+});
+
+// Update the server.listen to use server instead of app
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+    console.log(`Serving on port ${port}`);
 });

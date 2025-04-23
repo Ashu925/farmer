@@ -1,0 +1,84 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Buyer Dashboard</h1>
+            
+            <!-- Active Bids Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">My Active Bids</h5>
+                </div>
+                <div class="card-body">
+                    <% if (bids && bids.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>My Bid Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% bids.forEach(bid => { %>
+                                        <tr>
+                                            <td><%= bid.listing.title %></td>
+                                            <td>$<%= bid.amount %></td>
+                                            <td>
+                                                <% if (bid.listing.selectedBid && bid.listing.selectedBid.equals(bid._id)) { %>
+                                                    <span class="badge bg-success">Selected</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-warning">Pending</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <a href="/listings/<%= bid.listing._id %>" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i> View Listing
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted">You haven't placed any bids yet.</p>
+                        <a href="/" class="btn btn-primary">Browse Listings</a>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Messages Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Messages</h5>
+                </div>
+                <div class="card-body">
+                    <% if (chats && chats.length > 0) { %>
+                        <div class="list-group">
+                            <% chats.forEach(chat => { %>
+                                <a href="/chat/<%= chat._id %>" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1"><%= chat.listing.title %></h6>
+                                        <small class="text-muted"><%= chat.lastUpdated.toLocaleDateString() %></small>
+                                    </div>
+                                    <p class="mb-1"><%= chat.messages[chat.messages.length - 1].content %></p>
+                                    <% if (chat.unread.buyer) { %>
+                                        <span class="badge bg-danger">New</span>
+                                    <% } %>
+                                </a>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted">No messages yet.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %> 

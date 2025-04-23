@@ -111,11 +111,11 @@
                             <% } else if (listing.selectedBid && listing.selectedBid.toString() === bid.bidder.toString()) { %>
                                 <span class="badge bg-success">Selected</span>
                             <% } %>
-                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=<%= bid.bidder.email %>&su=<%= encodeURIComponent('Regarding your bid on ' + listing.title) %>" 
-                               target="_blank" 
-                               class="btn btn-info btn-sm contact-bidder">
-                                <i class="fas fa-envelope"></i> Contact
-                            </a>
+                            <form method="POST" action="/chat/<%= listing._id %>/start/<%= bid.bidder %>" style="display: inline;">
+                                <button type="submit" class="btn btn-info btn-sm contact-bidder">
+                                    <i class="fas fa-comments"></i> Chat
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <% if (bid.message) { %>
@@ -285,4 +285,33 @@
     margin-right: 5px;
 }
 </style>
+
+<script>
+    document.querySelectorAll('form[action^="/chat/"]').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    alert(data.error || 'Failed to start chat');
+                }
+            } catch (error) {
+                console.error('Error starting chat:', error);
+                alert('Failed to start chat. Please try again.');
+            }
+        });
+    });
+</script>
  
