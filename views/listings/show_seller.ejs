@@ -1,32 +1,288 @@
+<% layout("/layouts/biolerplate") %>
 
+<div class="details-card">
+    <h3><%= listing.title %></h3>
+    <div class="image-container">
+        <img src="/productimage/<%= listing.image %>" alt="Listing Image" class="listing-image" />
+    </div>
+    <p><%= listing.description %></p>
+    <p><strong>Price Mentioned:</strong> ₹<%= listing.price %></p>
+    <p><strong>Location:</strong> <%= listing.location %>, <%= listing.country %></p>
 
- <% layout("/layouts/biolerplate") %>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> <%= error %>
+        </div>
+    <% } %>
 
- <div class="details-card">
-     <h3><%= listing.title %></h3>
-     <img src="<%= listing.image %>" alt="Listing Image" class="listing-image" />
-     <p><strong>Description:</strong> <%= listing.description %></p>
-     <p><strong>Price:</strong> ₹<%= listing.price %></p>
-     <p><strong>Location:</strong> <%= listing.location %></p>
-     <p><strong>Country:</strong> <%= listing.country %></p>
- 
-     <a href="/listings/<%= listing._id %>/edit">Edit</a>
- 
-     <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
-         <button type="submit">Delete</button>
-     </form>
- 
-     <h4 class="mt-4">Bids (<%= listing.bids.length %>)</h4>
-     <ul>
-         <% listing.bids.forEach(bid => { %>
-             <li>
-                 <p><strong>Amount:</strong> ₹<%= bid.amount %></p>
-                 <p><strong>Message:</strong> <%= bid.message %></p>
-                 <form method="POST" action="/listings/<%= listing._id %>/select/<%= bid._id %>">
-                     <button type="submit">Select This Bid</button>
-                 </form>
-             </li>
-         <% }) %>
-     </ul>
- </div>
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <%= success %>
+        </div>
+    <% } %>
+
+    <% if (!data) { %>
+        <div class="alert alert-info">
+            <h4>Please login to manage your listing</h4>
+            <p>You need to be logged in to edit or manage your listings.</p>
+            <a href="/login" class="btn btn-primary">Login</a>
+            <a href="/register" class="btn btn-secondary">Register</a>
+        </div>
+    <% } else if (data._id && listing.createdby && data._id.toString() === listing.createdby._id.toString()) { %>
+        <div class="listing-actions mb-3">
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit Listing
+            </a>
+            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#contactBiddersModal">
+                <i class="fas fa-envelope"></i> Contact Bidders
+            </button>
+            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" style="display: inline;">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete Listing
+                </button>
+            </form>
+        </div>
+
+        <!-- Contact Bidders Modal -->
+        <div class="modal fade" id="contactBiddersModal" tabindex="-1" aria-labelledby="contactBiddersModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="contactBiddersModalLabel">Contact Bidders</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="bidders-list">
+                            <% if (listing.bids && listing.bids.length > 0) { %>
+                                <% listing.bids.forEach(bid => { %>
+                                    <div class="bidder-item mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">Bid Amount: ₹<%= bid.amount %></h6>
+                                                <small class="text-muted">Bid placed on <%= new Date(bid.createdAt).toLocaleDateString() %></small>
+                                            </div>
+                                            <button class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-envelope"></i> Contact
+                                            </button>
+                                        </div>
+                                        <% if (bid.message) { %>
+                                            <div class="mt-2">
+                                                <small class="text-muted">Message: <%= bid.message %></small>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <p class="text-muted">No bidders to contact yet.</p>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } else if (data.role === 'buyer') { %>
+        <div class="alert alert-warning">
+            <h4>This is not your listing</h4>
+            <p>You are viewing this listing as a buyer. You cannot edit or delete this listing.</p>
+            <a href="/listings/<%= listing._id %>" class="btn btn-primary">View as Buyer</a>
+        </div>
+    <% } %>
+
+    <h4 class="mt-4">Bids (<%= listing.bids ? listing.bids.length : 0 %>)</h4>
+    <div class="bids-container">
+        <% if (listing.bids && listing.bids.length > 0) { %>
+            <% listing.bids.sort((a, b) => b.amount - a.amount).forEach(bid => { %>
+                <div class="bid-card <%= listing.selectedBid && listing.selectedBid.toString() === bid.bidder.toString() ? 'selected-bid' : '' %>">
+                    <div class="bid-header">
+                        <div class="bid-info">
+                            <h5>₹<%= bid.amount %></h5>
+                            <small class="bid-date">Placed on <%= new Date(bid.createdAt).toLocaleDateString() %></small>
+                        </div>
+                        <div class="bid-actions">
+                            <% if (data && data._id && listing.createdby && data._id.toString() === listing.createdby._id.toString() && !listing.selectedBid) { %>
+                                <form method="POST" action="/listings/<%= listing._id %>/select/<%= bid._id %>" style="display: inline;">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-check"></i> Select This Bid
+                                    </button>
+                                </form>
+                            <% } else if (listing.selectedBid && listing.selectedBid.toString() === bid.bidder.toString()) { %>
+                                <span class="badge bg-success">Selected</span>
+                            <% } %>
+                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=<%= bid.bidder.email %>&su=<%= encodeURIComponent('Regarding your bid on ' + listing.title) %>" 
+                               target="_blank" 
+                               class="btn btn-info btn-sm contact-bidder">
+                                <i class="fas fa-envelope"></i> Contact
+                            </a>
+                        </div>
+                    </div>
+                    <% if (bid.message) { %>
+                        <p class="bid-message"><strong>Message:</strong> <%= bid.message %></p>
+                    <% } %>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No bids yet
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<style>
+.details-card {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.image-container {
+    max-width: 800px;
+    margin: 1rem auto;
+    text-align: center;
+}
+
+.listing-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.listing-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.bidder-item {
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.bidder-item:hover {
+    background-color: #e9ecef;
+}
+
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 10px 10px 0 0;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    border-radius: 0 0 10px 10px;
+}
+
+.bids-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.bid-card {
+    border: 1px solid #dee2e6;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.bid-card.selected-bid {
+    border: 2px solid #28a745;
+    background-color: #e8f5e9;
+}
+
+.bid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.bid-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.bid-info h5 {
+    margin: 0;
+    color: #28a745;
+    font-size: 1.25rem;
+}
+
+.bid-date {
+    color: #6c757d;
+}
+
+.bid-message {
+    margin: 0.5rem 0;
+    color: #6c757d;
+}
+
+.alert {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.fa-edit, .fa-trash, .fa-check, .fa-info-circle, .fa-exclamation-circle {
+    margin-right: 5px;
+}
+
+.bid-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.contact-bidder {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 0.375rem 0.75rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.contact-bidder:hover {
+    background-color: #138496;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.contact-bidder i {
+    margin-right: 5px;
+}
+</style>
  

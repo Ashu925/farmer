@@ -1,20 +1,3 @@
-<!-- <% layout("/layouts/biolerplate")%>
-<body>
-    <h3>listing detail : </h3>
-    <ul>
-        <li><%= listing.title%></li>
-        <li><%= listing.description%></li>
-        <li>&#8377;<%=listing.price.toLocaleString("en-IN")%></li>
-        <li><%= listing.location %></li>
-        <li><%= listing.country %></li>
-    
-    </ul>
-    <a href="/listings/<%=listing._id %>/edit">edit this listing </a>
-    <br><br>
-    <form method="POST" action="/listings/<%=listing._id %>?_method=DELETE">
-<button>delete this listings </button> 
-    </form>
-</body> -->
 <% layout("/layouts/biolerplate") %>
 
 <style>
@@ -84,24 +67,38 @@
 <div class="form-container">
     <h3>Edit Listing</h3>
 
-    <form method="POST" action="/listings/<%= listing._id %>?_method=PUT">
+    <!-- Form to update listing -->
+    <form action="/listings/edit/<%= listing._id %>" method="POST" enctype="multipart/form-data">
 
+        <!-- Title Input -->
         <label for="title" class="form-label">Title</label>
-        <input name="listing[title]" id="title" value="<%= listing.title %>" type="text" class="form-control" required>
+        <input name="title" id="title" type="text" value="<%= listing.title %>" class="form-control" placeholder="Enter Title" required>
 
+        <!-- Description Input -->
         <label for="description" class="form-label">Description</label>
-        <textarea name="listing[description]" id="description" class="form-control" rows="4" required><%= listing.description %></textarea>
+        <textarea name="description" id="description" class="form-control" placeholder="Enter Description" rows="4" required><%= listing.description %></textarea>
 
-        <label for="image" class="form-label">Image URL</label>
-        <input name="listing[image]" id="image" value="<%= listing.image %>" type="text" class="form-control">
-
+        <!-- Image Input -->
+        <label for="image" class="form-label">Image Link</label>
+        <div class="form-group">
+            <label for="image">Image</label>
+            <% if (listing.image) { %>
+                <div style="margin-bottom: 10px;">
+                    <img src="/productimage/<%= listing.image %>" alt="Current Image" style="max-width: 100%; height: auto; border-radius: 8px;">
+                </div>
+            <% } %>
+            <input name="image" id="image" type="file" class="form-control" placeholder="Upload Image" accept="image/*">
+        </div>
+        
+        <!-- Price Input -->
         <label for="price" class="form-label">Price</label>
-        <input name="listing[price]" id="price" value="<%= listing.price %>" type="number" min="0" class="form-control" required>
+        <input name="price" id="price" type="number" value="<%= listing.price %>" min="0" class="form-control" placeholder="Enter Price" required>
 
+        <!-- Location Input -->
         <label for="location" class="form-label">Location</label>
-        <input name="listing[location]" id="location" value="<%= listing.location %>" type="text" class="form-control" required>
+        <input name="location" id="location" type="text" value="<%= listing.location %>" class="form-control" placeholder="Enter Location" required>
 
+        <!-- Submit Button -->
         <button class="btn" type="submit">Save Changes</button>
-
     </form>
 </div>

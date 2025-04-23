@@ -1,11 +1,7 @@
 const mongoose = require("mongoose");
-const { createHmac, randomBytes } = require("node:crypto");
+const bcrypt = require("bcrypt");
 
 const { createtoken } = require("../services/jwtcreater");
-
-
-
-// const { createtoken } = require("../services/jwtcreater");
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
@@ -17,63 +13,44 @@ const userSchema = new mongoose.Schema({
     enum: ["buyer", "seller"],
     required: true,
   },
+}, { timestamps: true });
+
+// Hash password before saving
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-userSchema.pre("save", function (next) {
-  const user = this;
-  if (!user.isModified("password")) return next(); // fixed
-
-  const secret = randomBytes(16).toString("hex");
-  const pass = createHmac("sha256", secret)
-    .update(user.password)
-    .digest("hex");
-
-  user.salt = secret;
-  user.password = pass;
-  next();
-});
-
-
-userSchema.statics.checkuserandverify = async function (email, password) {
-  const user = await this.findOne({ email }); // make sure email is in schema
-  if (!user) throw new Error("User not found");
-
-// userSchema.statics.checkuserandverify = async function (email, password) {
-//   const user = await this.findOne({ email }); // make sure email is in schema
-//   if (!user) throw new Error("User not found");
-
-
-  const hashedInputPassword = createHmac("sha256", user.salt)
-    .update(password)
-    .digest("hex");
-
-
-  if (hashedInputPassword !== user.password) throw new Error("Wrong password");
-  
-  const token = createtoken(user);
-  return token;
+// Method to compare passwords
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw error;
+  }
 };
 
-//   if (hashedInputPassword !== user.password) throw new Error("Wrong password");
-
-//   const token = createtoken(user);
-//   return token;
-// };
-
-
-
+// Static method to verify user credentials
 userSchema.statics.checkuserandverify = async function (email, password) {
-  const user = await this.findOne({ email }); // make sure email is in schema
-  if (!user) throw new Error("User not found");
-
-  const hashedInputPassword = createHmac("sha256", user.salt)
-    .update(password)
-    .digest("hex");
-
-  if (hashedInputPassword !== user.password) throw new Error("Wrong password");
-
-  const token = createtoken(user)
-  return token;
+  try {
+    const user = await this.findOne({ email });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      throw new Error("Invalid password");
+    }
+    return user;
+  } catch (error) {
+    throw error;
+  }
 };
 
 module.exports = mongoose.model("User", userSchema);
