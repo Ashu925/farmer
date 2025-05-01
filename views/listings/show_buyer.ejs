@@ -1,23 +1,199 @@
-
 <% layout("/layouts/biolerplate") %>
 
 <div class="details-card">
     <h3><%= listing.title %></h3>
-    <img src="<%= listing.image %>" alt="Listing Image" class="listing-image" />
+    <img src="/productimage/<%= listing.image %>" alt="Listing Image" class="listing-image" />
     <p><%= listing.description %></p>
     <p><strong>Price Mentioned:</strong> ₹<%= listing.price %></p>
     <p><strong>Location:</strong> <%= listing.location %>, <%= listing.country %></p>
 
-    <h4>Place Your Bid</h4>
-    <form action="/listings/<%= listing._id %>/bids" method="POST">
-        <label for="amount">Bid Amount:</label><br/>
-        <input type="number" name="amount" required><br/><br/>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> <%= error %>
+        </div>
+    <% } %>
 
-        <label for="message">Message:</label><br/>
-        <textarea name="message" rows="3"></textarea><br/><br/>
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <%= success %>
+        </div>
+    <% } %>
 
-        <button type="submit">Submit Bid</button>
-    </form>
+    <% if (!data) { %>
+        <div class="alert alert-info">
+            <h4>Please login to place a bid</h4>
+            <p>You need to be logged in to place bids on listings.</p>
+            <a href="/login" class="btn btn-primary">Login</a>
+            <a href="/register" class="btn btn-secondary">Register</a>
+        </div>
+    <% } else if (listing.selectedBid && listing.selectedBid.toString() === data._id.toString()) { %>
+        <div class="alert alert-success">
+            <h4>Congratulations! Your bid has been selected!</h4>
+            <p>Please contact the seller to proceed with the transaction.</p>
+        </div>
+    <% } else if (listing.selectedBid) { %>
+        <div class="alert alert-info">
+            <p>This listing has been closed. A bid has been selected by the seller.</p>
+        </div>
+    <% } else if (listing.createdby && listing.createdby._id && listing.createdby._id.toString() === data._id.toString()) { %>
+        <div class="alert alert-warning">
+            <h4>This is your listing</h4>
+            <p>You cannot place bids on your own listings.</p>
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-primary">Edit Listing</a>
+        </div>
+    <% } else { %>
+        <h4>Place Your Bid</h4>
+        <form action="/listings/<%= listing._id %>/bids" method="POST" class="bid-form">
+            <div class="form-group">
+                <label for="amount">Bid Amount (₹):</label>
+                <input type="number" name="amount" id="amount" class="form-control" required 
+                       min="<%= listing.price %>" step="0.01"
+                       placeholder="Enter amount higher than ₹<%= listing.price %>">
+                <small class="form-text text-muted">Your bid must be higher than the listed price (₹<%= listing.price %>)</small>
+            </div>
 
-    <h5 class="mt-4">Total Bids: <%= listing.bids.length %></h5>
+            <div class="form-group">
+                <label for="message">Message to Seller:</label>
+                <textarea name="message" id="message" rows="3" class="form-control" 
+                          placeholder="Add any additional information for the seller"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-gavel"></i> Place Bid
+            </button>
+        </form>
+    <% } %>
+
+    <h5 class="mt-4">Bid History</h5>
+    <div class="bids-list">
+        <% if (listing.bids && listing.bids.length > 0) { %>
+            <% listing.bids.sort((a, b) => b.amount - a.amount).forEach(bid => { %>
+                <div class="bid-item <%= listing.selectedBid && listing.selectedBid.toString() === bid.bidder.toString() ? 'selected-bid' : '' %>">
+                    <div class="bid-header">
+                        <span class="bid-amount">₹<%= bid.amount %></span>
+                        <% if (listing.selectedBid && listing.selectedBid.toString() === bid.bidder.toString()) { %>
+                            <span class="badge bg-success">Selected</span>
+                        <% } %>
+                    </div>
+                    <% if (bid.message) { %>
+                        <p class="bid-message"><%= bid.message %></p>
+                    <% } %>
+                    <small class="bid-date">Placed on <%= new Date(bid.createdAt).toLocaleDateString() %></small>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p class="text-muted">No bids yet</p>
+        <% } %>
+    </div>
 </div>
+
+<style>
+.details-card {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.listing-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.bid-form {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.bids-list {
+    margin-top: 1rem;
+}
+
+.bid-item {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.bid-item.selected-bid {
+    border-color: #28a745;
+    background-color: #e8f5e9;
+}
+
+.bid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.bid-amount {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.bid-message {
+    margin: 0.5rem 0;
+    color: #6c757d;
+}
+
+.bid-date {
+    color: #6c757d;
+}
+
+.alert {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.fa-gavel, .fa-check-circle, .fa-exclamation-circle {
+    margin-right: 5px;
+}
+</style>

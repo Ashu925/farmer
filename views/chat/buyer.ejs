@@ -1,0 +1,83 @@
+<% layout("/layouts/biolerplate") %>
+
+<div class="container mt-4">
+    <h2>Your Bids and Messages</h2>
+    
+    <% if (chats.length === 0) { %>
+        <div class="alert alert-info">
+            <i class="fas fa-comments"></i> You don't have any active chats yet.
+        </div>
+    <% } else { %>
+        <div class="chat-list">
+            <% chats.forEach(chat => { %>
+                <div class="chat-item card mb-3 <%= chat.unread.buyer ? 'unread' : '' %>">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">
+                                    <%= chat.listing.title %>
+                                    <% if (chat.unread.buyer) { %>
+                                        <span class="badge bg-danger">New</span>
+                                    <% } %>
+                                </h5>
+                                <p class="card-text">
+                                    <% chat.participants.forEach(participant => { %>
+                                        <% if (!participant._id.equals(currentUser._id)) { %>
+                                            Chat with <%= participant.username %>
+                                        <% } %>
+                                    <% }) %>
+                                </p>
+                                <small class="text-muted">
+                                    Last updated: <%= new Date(chat.lastUpdated).toLocaleString() %>
+                                </small>
+                            </div>
+                            <a href="/chat/<%= chat._id %>" class="btn btn-primary">
+                                <i class="fas fa-comments"></i> Open Chat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+
+<style>
+.chat-item {
+    transition: transform 0.2s ease;
+}
+
+.chat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.chat-item.unread {
+    border-left: 4px solid #dc3545;
+    background-color: #fff8f8;
+}
+
+.card-title {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.card-text {
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border: none;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.badge {
+    margin-left: 0.5rem;
+}
+</style> 
